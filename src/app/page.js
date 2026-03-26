@@ -10,7 +10,7 @@ export default function Home () {
         <div>
           <h1>Ourt</h1>
           <p>Tu tiempo, tu dinero.</p>
-          <Link href="#">
+          <Link href="/login">
             <button>Comenzar</button>
           </Link>
         </div>
