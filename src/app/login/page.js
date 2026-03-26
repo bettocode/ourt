@@ -18,6 +18,7 @@ export default function Login ({ href }) {
   const [jwt_user, setJWTUser] = useState(
     JSON.parse(localStorage.getItem('ourt-user')) || null
   )
+  const [errorMessage, setErrorMessage] = useState(null);
   const router = useRouter();
 
 
@@ -34,18 +35,22 @@ export default function Login ({ href }) {
           body: new URLSearchParams({ email: email, password: password })
         }
       )
+      if (response.status === 200) {
+        const data = await response.json();
 
-      const data = await response.json();
-
-      if (data.user) {
-        setUser(data.user);
-        setJWTUser(data.refresh_token);
-        localStorage.setItem("ourt-user", JSON.stringify(data.user))
-        localStorage.setItem("ourt-jwtUser", JSON.stringify(data.refresh_token))
+        if (data.user) {
+          setUser(data.user);
+          setJWTUser(data.refresh_token);
+          localStorage.setItem("ourt-user", JSON.stringify(data.user))
+          localStorage.setItem("ourt-jwtUser", JSON.stringify(data.refresh_token))
+        }
       }
 
+      if (response.status === 401) setErrorMessage("Invalid email or password")
+      if (response.status === 403) setErrorMessage("Account is inactive")
+
     } catch (error) {
-      console.log("Error:", error)
+      console.log("Error:", error);
     }
   }
 
@@ -83,6 +88,7 @@ export default function Login ({ href }) {
                 userLogin();
               }}
             />
+            <p>{errorMessage}</p>
           </form>
           <Link href="/">
             <button>Home</button>
