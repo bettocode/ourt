@@ -1,5 +1,5 @@
 'use client'
-import Image from "next/image";
+
 import styles from "../page.module.css";
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -7,30 +7,28 @@ import { useRouter } from 'next/navigation';
 
 
 
-export default function Login ({ href }) {
-
+export default function Login () {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem('ourt-user')) || null
   )
-  const [jwt_user, setJWTUser] = useState(
-    JSON.parse(localStorage.getItem('ourt-user')) || null
-  )
+
   const [errorMessage, setErrorMessage] = useState(null);
   const router = useRouter();
 
 
   async function userLogin () {
     const url = "https://eloy-back-timer-api-server.onrender.com/api/v1/auth/login";
+    console.log(process.env.xapikey)
     try {
       const response = await fetch(url,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "x-api-key": process.env.xapikey
+            "x-api-key": process.env.NEXT_PUBLIC_XAPIKEY
           },
           body: new URLSearchParams({ email: email, password: password })
         }
@@ -40,9 +38,9 @@ export default function Login ({ href }) {
 
         if (data.user) {
           setUser(data.user);
-          setJWTUser(data.refresh_token);
           localStorage.setItem("ourt-user", JSON.stringify(data.user))
-          localStorage.setItem("ourt-jwtUser", JSON.stringify(data.refresh_token))
+          localStorage.setItem("ourt-jwt-access", JSON.stringify(data.access_token))
+          localStorage.setItem("ourt-jwt-refresh", JSON.stringify(data.refresh_token))
         }
       }
 
@@ -56,12 +54,12 @@ export default function Login ({ href }) {
 
   useEffect(() => {
     if (user) {
-      router.push('/')
+      router.push('/admin')
     }
   }, [user])
 
-  return (
-    <div className={styles.page}>
+  if (!user) {
+    <div div className={styles.page} >
       <main className={styles.main}>
         <div>
           <h1>Iniciar Sesión</h1>
@@ -96,5 +94,7 @@ export default function Login ({ href }) {
         </div>
       </main>
     </div>
-  );
+  } else {
+    <div></div>
+  }
 }
